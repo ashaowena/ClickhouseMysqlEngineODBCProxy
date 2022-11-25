@@ -12,17 +12,17 @@ public class ClickHouseMysqlEngineODBCHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ClickHouseMysqlEngineODBCHandler.class);
 
-    private volatile byte[] data;// 数据集
+    private byte[] data;// 数据集
 
-    private volatile int remain;
+    private int remain;
 
-    private volatile int type;// 0:普通 1:错误报文
+    private int type;// 0:普通 1:错误报文
 
-    private volatile boolean hasCompleted;
+    private boolean hasCompleted;
 
-    private volatile int rowSetIdx;
+    private int rowSetIdx;
 
-    private volatile int eofScannerIdx;
+    private int eofScannerIdx;
 
     public ClickHouseMysqlEngineODBCHandler() {
         this.data = new byte[0];

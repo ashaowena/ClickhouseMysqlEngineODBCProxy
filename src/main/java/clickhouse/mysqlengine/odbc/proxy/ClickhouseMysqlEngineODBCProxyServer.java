@@ -50,7 +50,7 @@ public class ClickhouseMysqlEngineODBCProxyServer {
             netServer.connectHandler(socket -> netClient.connect(clickhousePort, clickhouseHost, result -> {
                 //响应来自客户端的连接请求，成功之后，在建立一个与目标clickhouse服务器的连接
                 if (result.succeeded()) {
-                    //与目标mysql服务器成功连接连接之后，创造一个ClickhouseMysqlEngineODBCProxyConnection对象,并执行代理方法
+                    //与目标clickhouse服务器成功连接连接之后，创造一个ClickhouseMysqlEngineODBCProxyConnection对象,并执行代理方法
                     new ClickhouseMysqlEngineODBCProxyConnection(socket, result.result()).proxy();
                 } else {
                     logger.error(result.cause().getMessage(), result.cause());
