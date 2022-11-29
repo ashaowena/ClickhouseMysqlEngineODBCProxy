@@ -4,6 +4,7 @@ package clickhouse.mysqlengine.odbc.proxy;
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.impl.BufferImpl;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
@@ -112,20 +113,18 @@ public class ClickhouseMysqlEngineODBCProxyServer {
                                 if (this.engineHandler.hasCompleted()) {
                                     // 确保数据集完整后，开始补充字段最大长度与转换字段类型
                                     engineHandler.handler();
-                                    // 清空原有报文并推流
-                                    for (int i = 0; i < buffer.length(); i++) {
-                                        buffer.setByte(i, (byte) 0);
-                                    }
-                                    buffer.setBytes(0, engineHandler.read());
+                                    // 推流
+                                    clientSocket.write(BufferImpl.buffer(engineHandler.read()));
+                                    // 清空handler
                                     this.engineHandler.clear();
-                                } else {
-                                    return;
                                 }
+                                return;
                             }
+
                             clientSocket.write(buffer);
                         } catch (Exception e) {
-                            logger.error(e.getMessage());
                             close();
+                            logger.error(e.getMessage());
                         }
 
                     }

@@ -61,9 +61,6 @@ public class ClickHouseMysqlEngineODBCHandler {
     }
 
     public byte[] read() {
-        if (!hasCompleted()) {
-            return new byte[0];
-        }
         return this.data;
     }
 
@@ -222,8 +219,11 @@ public class ClickHouseMysqlEngineODBCHandler {
                         len = rw;
                 }
 
-
-                columnMaxLength[i] = Math.max(columnMaxLength[i] ,new String(tmp,idx + 1,len).length() * 4L);
+//              使用if + for循环替换原版方法 columnMaxLength[i] = Math.max(columnMaxLength[i] ,new String(tmp,idx + 1,len).length())
+                long num = num(tmp, idx + 1, len);
+                if (columnMaxLength[i] < num) {
+                    columnMaxLength[i] = num;
+                }
 
                 idx = skipPara(idx,tmp);
             }
@@ -232,8 +232,35 @@ public class ClickHouseMysqlEngineODBCHandler {
             idxForSkip = idx;
         }
 
+        for (int i = 0; i < columnMaxLength.length; i++) {
+            columnMaxLength[i] = columnMaxLength[i] * 4L;
+        }
 
         return columnMaxLength;
+    }
+
+    /**
+     * 字节数组转字符个数
+     * @param chars
+     * @param off
+     * @param len
+     * @return
+     */
+    private long num(byte[] chars,int off,int len) {
+        long num = 0L;
+        int idx = off;
+        int rowLen = idx + len;
+        while (idx < rowLen) {
+            int v_9 = chars[idx];
+            if (v_9 < 0) {
+                idx += 3;
+            } else {
+                idx++;
+            }
+            num++;
+        }
+
+        return num;
     }
 
     /**
