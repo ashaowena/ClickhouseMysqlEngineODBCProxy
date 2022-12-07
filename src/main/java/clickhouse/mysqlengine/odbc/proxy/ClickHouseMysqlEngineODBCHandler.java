@@ -204,22 +204,22 @@ public class ClickHouseMysqlEngineODBCHandler {
                     case -5: // null
                         break;
                     case -4:
-                        len = (tmp[idx] + 1  & 0xff) | ((tmp[idx] + 2  & 0xff) << 8);
+                        len = (tmp[idx + 1] & 0xff) | ((tmp[idx + 2] & 0xff) << 8);
                         break;
                     case -3:
-                        len = (tmp[idx] + 1 & 0xff) | ((tmp[idx] + 2 & 0xff) << 8) | ((tmp[idx] + 3 & 0xff) << 16);
+                        len = (tmp[idx + 1] & 0xff) | ((tmp[idx + 2] & 0xff) << 8) | ((tmp[idx + 3] & 0xff) << 16);
                         break;
                     case -2:
-                        len = (int) ((tmp[idx] + 1  & 0xff) | ((long) (tmp[idx] + 2  & 0xff) << 8)
-                                | ((long) (tmp[idx] + 3  & 0xff) << 16) | ((long) (tmp[idx] + 4  & 0xff) << 24)
-                                | ((long) (tmp[idx] + 5  & 0xff) << 32) | ((long) (tmp[idx] + 6  & 0xff) << 40)
-                                | ((long) (tmp[idx] + 7  & 0xff) << 48) | ((long) (tmp[idx] + 8  & 0xff) << 56));
+                        len = (int) ((tmp[idx + 1] & 0xff) | ((long) (tmp[idx + 2] & 0xff) << 8)
+                                | ((long) (tmp[idx + 3] & 0xff) << 16) | ((long) (tmp[idx + 4] & 0xff) << 24)
+                                | ((long) (tmp[idx + 5] & 0xff) << 32) | ((long) (tmp[idx + 6] & 0xff) << 40)
+                                | ((long) (tmp[idx + 7] & 0xff) << 48) | ((long) (tmp[idx + 8] & 0xff) << 56));
                         break;
                     default:
                         len = rw;
                 }
 
-//              使用if + for循环替换原版方法 columnMaxLength[i] = Math.max(columnMaxLength[i] ,new String(tmp,idx + 1,len).length())
+//              使用for + if循环替换原版方法 columnMaxLength[i] = Math.max(columnMaxLength[i] ,new String(tmp,idx + 1,len).length())
                 long num = num(tmp, idx + 1, len);
                 if (columnMaxLength[i] < num) {
                     columnMaxLength[i] = num;
@@ -251,13 +251,12 @@ public class ClickHouseMysqlEngineODBCHandler {
         int idx = off;
         int rowLen = idx + len;
         while (idx < rowLen) {
-            int v_9 = chars[idx];
-            if (v_9 < 0) {
+            if (chars[idx] < 0) {
                 idx += 3;
             } else {
-                idx++;
+                ++idx;
             }
-            num++;
+            ++num;
         }
 
         return num;
