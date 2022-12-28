@@ -27,6 +27,7 @@ public class ClickhouseMysqlEngineODBCProxyServer {
 
         private final String clickhouseHost;
         private final int clickhousePort;
+        private final int serverPort;
 
 
         ClickhouseMysqlEngineODBCProxyServerVerticle() {
@@ -42,6 +43,11 @@ public class ClickhouseMysqlEngineODBCProxyServer {
             }
             this.clickhousePort = Integer.parseInt(clickhousePort);
 
+            String serverPort = System.getProperty("server.port");
+            if (StringUtil.isNullOrEmpty(serverPort)) {
+                serverPort = "19004";
+            }
+            this.serverPort = Integer.parseInt(serverPort);
         }
 
         @Override
@@ -57,10 +63,10 @@ public class ClickhouseMysqlEngineODBCProxyServer {
                     logger.error(result.cause().getMessage(), result.cause());
                     socket.close();
                 }
-            })).listen(clickhousePort, listenResult -> {//代理服务器的监听端口
+            })).listen(serverPort, listenResult -> {//代理服务器的监听端口
                 if (listenResult.succeeded()) {
                     //成功启动代理服务器
-                    logger.info("Clickhouse proxy server start up. host:" + this.clickhouseHost + " port:" + this.clickhousePort);
+                    logger.info("Clickhouse proxy server start up. clickhouse.host:" + this.clickhouseHost + " clickhouse.port:" + this.clickhousePort+ " server.port:" + this.serverPort);
                 } else {
                     //启动代理服务器失败
                     logger.error("Clickhouse proxy exit. because: " + listenResult.cause().getMessage(), listenResult.cause() + " host:" + this.clickhouseHost + " port:" + this.clickhousePort);
